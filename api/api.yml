@@ -1,0 +1,182 @@
+openapi: 3.0.0
+# Added by API Auto Mocking Plugin
+servers:
+  - description: API Server of LiveChat Manager
+    url: https://chat.caixamais.gov.br/api/v1
+# Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/franfig-hub/RocketChatManager/1.0.0
+info:
+  version: "0.1.0"
+  title: Sistema de geração de dados de gerenciamento do LiveChat da CAIXA
+  description: >-
+    Sistema de geração de dados de qualidade para o LiveChat da Caixa Economica
+
+tags:
+  - name: attendants
+    description: Consolidação de dados do atendente / attendants data consolidation
+  - name: system
+    description: system data and options
+
+
+security:
+  - implicit:
+      - read
+      - write
+
+components:
+  x-mongose-server:
+    defaultDatabase: GerenciamentoChatCAIXA
+    connectionString: $MONGO_URL_CONNECT_SERVER #Enviroment variable
+    
+  schemas: 
+    Address:
+      type: object
+      properties:
+        logradouro:
+          type: string
+          example: Setor Comercial Sul, Quadra 2, Bloco B, Lote 20 Sala 
+        numero:
+          type: string
+          example: 706
+        complemento:
+          type: string
+          example: Ed. Palácio do Comércio
+        bairro:
+          type: string
+          example: Asa Sul
+        cidade:
+          type: string
+          example: Brasília
+          x-mongose: 
+            trim: true
+            uppercase: false
+            index: true
+        uf:
+          type: string
+          example: DF
+          x-mongose: 
+            trim: true
+            uppercase: true
+            index: true
+        cep:
+          type: number
+          format: int
+          example: 70318900
+          x-mongose: 
+            index: true
+        location:
+          type: object
+          properties:
+            type: 
+              type: string
+              example: Point
+            coordinates: 
+              type: array
+              items: 
+                type: number
+                example: 
+                  - -73.856077
+                  - 40.848447
+
+    SystemOptions:
+      type: object
+      properties:
+        timeLimitWaitMinutes:
+          type: integer
+          format: int
+          description: Timeout for client expect a response attendant / Tempo limite para o cliente esperar uma resposta do atendente 
+          default: 60
+          example: 60
+          minimum: 1
+          maximum: 1200
+        initTimeHour:
+          type: integer
+          format: int
+          description: Customer service starts at 9am / Atendimento inicia as 9h
+          default: 9
+          example: 9
+          minimum: 0
+          maximum: 24
+        finishTimeHour:
+          type: integer
+          format: int
+          description: Customer service ends at 6pm / Atendimento termina às 18h
+          minimum: 0
+          maximum: 24
+        cutHour:
+          type: integer
+          format: int
+          description: Customer service ends at 6pm / Atendimento termina às 18h
+          minimum: 0
+          maximum: 24
+        connectRocketChatOptions:
+            type: object
+            properties:
+              userService:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    format: username
+                    pattern: ^[A-Za-z0-9]+$
+                    description: Rocket chat user service name / Nome do usuário de serviço do rocket chat
+                  password:
+                    type: string
+                    format: username
+                required:
+                  - name
+                  - password
+        serverType:
+          type: string
+          default: corporativo
+          description: Rocket chat type user
+          enum:
+            - corporativo
+            - departamental
+            - testes
+            - homologação
+        nomeChefe:
+          type: string
+          description: Rocket chat test
+          pattern: '^\d.*?$'
+          x-mongose: 
+            trim: true
+            uppercase: true
+            index: true
+        addressCompany:
+            $ref: '#/components/schemas/Address'
+          
+        
+  securitySchemes:
+    implicit:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: 'http://example.com/oauth/auth'
+          scopes:
+            write: allows modifying resources
+            read: allows reading resources      
+      
+paths:
+  /options:
+    get:
+      tags: 
+        - system
+      summary: Get options settings from server
+      description: Get settings from server to client
+      responses:
+        '200':
+          description: OK
+          
+  /ping:
+    get:
+      summary: Server heartbeat operation
+      description: >-
+        This operation shows how to override the global security defined above,
+        as we want to open it up for all users.
+      security: []
+      responses:
+        '200':
+          description: OK
+          

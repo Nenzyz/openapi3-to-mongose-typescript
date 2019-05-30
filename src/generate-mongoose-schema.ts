@@ -3,7 +3,7 @@ const yaml = require('js-yaml');
 import * as fs from 'fs';
 import * as path from 'path';
 import moment from 'moment';
-import { capitalize, capitalizeInalterate } from './util.function';
+import { capitalize, capitalizeInalterate } from '../util/functions';
  
 // Get document, or throw exception on error
 const commomDirModel: string = './models/' 

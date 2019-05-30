@@ -1,0 +1,1443 @@
+openapi: 3.0.2
+info:
+  version: '1.0.0'
+  title: World Handicap System - Proposed Interoperability Standard
+  description: >-
+    The United States Golf Association and the R&A set out to harmonize the various handicapping systems used around the world and to develop a single system that brings together the best of the various methods. The result of this effort is the World Handicap System (WHS) scheduled to be used by National Associations beginning in 2020. This document proposes a common set of protocols to be used by National Associations and their technology providers as the basis of building a trully open and interoperable network of systems. The ability to search golfers, retrieve handicap information and post scores on officially rated courses protocols serve as a first effort into standardizing such information exchanges.
+
+
+    **Authentication**
+
+
+    In order to authenticate and use the APIs described in this document we are using the `apiKey` security scheme. After receiving an API Key from the National Association, please pass the API Key in the header for each request.
+
+
+    **Format**
+
+
+    Each of the API endpoints described below use `json` formatting.
+    
+    
+    **Authors**
+    
+    
+    The `World Handicap System - Proposed Interoperability Standard` is prepared by a technology group composed of Golf Genius Software and MPower MSL representatives.
+paths:
+  '/golfers/search/':
+    get:
+      description: >-
+        Searches for a Golfer by their name, city, state and country.
+      summary: Search Golfers
+      tags:
+        - Golfer
+      parameters:
+        - name: firstName
+          in: query
+          schema:
+            type: string
+          description: The first name of the Golfer, will perform a partial case-insensitive match
+        - name: lastName
+          in: query
+          schema:
+            type: string
+          description: The last name of the Golfer, will perform a partial case-insensitive match
+        - name: city
+          in: query
+          schema:
+            type: string
+          description: The city of the Golfer, will perform a partial case-insensitive match
+        - name: state
+          in: query
+          schema:
+            type: string
+          description: The state of the Golfer (e.g., "US-CA" using ISO 3166-2:US). If parameter set, it will perform a full match.
+        - name: country
+          in: query
+          schema:
+            type: string
+          description: The country of the Golfer (e.g., "US" using ISO 3166-1 alpha-2). If parameter set, it will perform a full match.
+        - name: page
+          in: query
+          schema:
+            type: number
+          description: Defaults to 1 - how many result pages to return
+        - name: perPage
+          in: query
+          schema:
+            type: number
+          description: Defaults to 50 - how many golfers to return per page
+      responses:
+        '200':
+          description: OK, return array of matching Golfer objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    golfer:
+                      $ref: '#/components/schemas/Golfer'
+              example:
+                - golfer:
+                    golferNumber: '123456'
+                    firstName: John
+                    lastName: Doe
+                    gender: Male
+                    country: 'US'
+                    state: 'NJ'
+                    city: 'Far Hills'
+                    handicapIndex: 4.2
+                    handicapIndexDisplay: "4.2"
+                    lowHandicapIndex: 3.6
+                    lowHandicapIndexDisplay: "3.6"
+        '451':
+          description: Unavailable for legal reasons
+                  
+
+  '/golfer/{golferNumber}/':
+    get:
+      description: >-
+        Get Golfer Profile by Golfer Number
+      summary: Get Golfer Profile by Golfer Number
+      tags:
+        - Golfer
+      parameters:
+        - name: golferNumber
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique Golfer ID within the National Association
+      responses:
+        '200':
+          description: OK, retrieve Golfer object
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  golfer:
+                    $ref: '#/components/schemas/Golfer'
+              example:
+                golfer:
+                  golferNumber: '123456'
+                  firstName: John
+                  lastName: Doe
+                  gender: Male
+                  country: 'US'
+                  state: 'NJ'
+                  city: 'Far Hills'
+                  handicapIndex: 4.2
+                  handicapIndexDisplay: "4.2"
+                  lowHandicapIndex: 3.6
+                  lowHandicapIndexDisplay: "3.6"
+        '404':
+          description: Resource not found, no Golfer object with specified golferNumber exists
+          content:
+            application/json:
+              schema:
+                type: object
+                  
+  '/golfers/':
+    get:
+      description: >-
+        Retrieves profiles of several golfers given their golferNumbers in an array format
+      summary: Retrieve Multiple Golfer Profiles
+      tags:
+        - Golfer
+      parameters: 
+        - name: golferNumbers
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+          description: List of Golfer IDs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    golfer:
+                      $ref: '#/components/schemas/Golfer'
+              example:
+                - golfer:
+                    golferNumber: '123456'
+                    firstName: John
+                    lastName: Doe
+                    gender: Male
+                    country: 'US'
+                    state: 'NJ'
+                    city: 'Far Hills'
+                    handicapIndex: 4.2
+                    handicapIndexDisplay: "4.2"
+                    lowHandicapIndex: 3.6
+                    lowHandicapIndexDisplay: "3.6"
+                - golfer:
+                    golferNumber: '123457'
+                    firstName: Jane
+                    lastName: Doe
+                    gender: Female
+                    country: 'US'
+                    state: 'NJ'
+                    city: 'Far Hills'
+                    handicapIndex: -1.2
+                    handicapIndexDisplay: "+1.2"
+                    lowHandicapIndex: -1.2
+                    lowHandicapIndexDisplay: "+1.2"
+                
+  '/golfer/{golferNumber}/handicapAtDate/':
+    get:
+      description: >-
+        Retrieve handicap revision of golfer at specified date.
+      summary:
+        Get Handicap of Golfer at Date
+      tags:
+        - Handicap
+      parameters: 
+        - name: golferNumber
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Golfer ID
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Date for handicap in format YYYY-MM-DD per RFC3339 (e.g., "2020-04-18")
+      responses:
+        '200':
+          description: A HandicapRevision object (see HandicapRevision schema).
+          content:
+            application/json:
+              schema:
+                type: object # handicap
+                properties:
+                  handicap:
+                     $ref: '#/components/schemas/HandicapRevision'
+              example:
+                handicap:
+                  golferNumber: '123456'
+                  date: '2020-05-21'
+                  handicapIndex: 4.2
+                  handicapIndexDisplay: "4.2"
+                  lowHandicapIndex: 3.6
+                  lowHandicapIndexDisplay: "3.6"
+                  numberOfScores: 6
+                  usedScores: ['101', '102', '103', '104']
+                  availableScores: ['101', '102', '103', '104', '105', '106']
+        '404':
+          description: Resource not found, no HandicapRevision object found
+          content:
+            application/json:
+              schema:
+                type: object
+  '/golfer/{golferNumber}/handicapForDates/':
+    get:
+      description: >-
+        Get handicaps of golfer between the specified start and end dates. There can be multiple handicap revisions in the given time interval, so they are returned in array format. 
+      summary:
+        Get Handicap of Golfer in Time Interval (e.g., each handicap revision)
+      tags:
+        - Handicap
+      parameters: 
+        - name: golferNumber
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Golfer ID
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Start date (YYYY-MM-DD format)
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          description: End date (YYYY-MM-DD format)
+      responses:
+        '200':
+          description: An array of handicap revisions (Handicap objects).
+          content:
+            application/json:
+              schema:
+                type: array # array of handicap revisions
+                items:
+                  type: object # handicap
+                  properties:
+                    handicap:
+                       $ref: '#/components/schemas/HandicapRevision'
+              example:
+                items:
+                  - handicap:
+                      golferNumber: '84580'
+                      date: '2019-05-01'
+                      handicapIndex: 2.0
+                      lowHandicapIndex: 1.8
+                      numberOfScores: 4
+                      usedScores: ['201', '202']
+                      availableScores: ['201', '202', '203', '204']
+                  - handicap:
+                      golferNumber: '84580'
+                      date: '2019-05-21'
+                      handicapIndex: 2.2
+                      lowHandicapIndex: 1.8
+                      numberOfScores: 5
+                      usedScores: ['201', '202', '205']
+                      availableScores: ['201', '202', '203', '204', '205']
+                
+
+  '/golfers/{golferNumber}/scores/':
+    post:
+      description: >-
+        Post new Score for Golfer.
+      summary: Post new Score for Golfer
+      tags:
+        - Score
+      parameters:
+        - name: golferNumber
+          required: true
+          in: path
+          schema:
+            type: string
+          description: Golfer ID
+        - name: formOfPlay
+          required: true 
+          in: query
+          schema:
+            type: string
+            enum:
+              - Stableford
+              - Stroke
+              - Par/Bogey
+              - MaximumScore
+          description: Type of competition
+        - name: courseID
+          in: query
+          schema:
+            type: string
+          description: Course ID (as returned in the /courses API)
+        - name: teeID
+          in: query
+          schema:
+            type: string
+          description: Tee ID (as returned in the /tees API)
+        - name: datePlayed
+          required: true
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Date of competition - "YYYY-MM-DD"
+        - name: scoreType
+          in: query
+          schema:
+            type: string
+            enum: [Home, Away, Tournament]
+          description: Score type
+        - name: numberOfHoles
+          required: true
+          in: query
+          schema:
+            type: integer
+            enum: [9,18]
+          description: Number of holes
+        - name: courseRating
+          required: true
+          in: query
+          schema:
+            type: number
+          description: Course rating
+        - name: slopeRating
+          required: true
+          in: query
+          schema:
+            type: integer
+          description: Slope rating
+        - name: courseHandicap
+          in: query
+          schema:
+            type: integer
+          description: Course handicap
+        - name: playingHandicap
+          in: query
+          schema:
+            type: integer
+          description: Playing handicap
+        - name: par
+          in: query
+          schema:
+            type: integer
+          description: Total par on tee played
+        - name: competitionScore
+          in: query
+          schema:
+            type: integer
+          description: Stableford points, Quota points, Nets score. Depending on the competition type.
+        - name: handicappingScore
+          required: true
+          in: query
+          schema:
+            type: integer
+          description: Score to use for handicap updates.
+        - name: isArtificialScore
+          in: query
+          schema:
+            type: boolean
+          description: True if score is only for calculating the initial handicap.
+        - name: isRecreationalScore
+          in: query
+          schema:
+            type: boolean
+          description: True if score is not obtained in an official competition.
+        - name: isScaled
+          in: query
+          schema:
+            type: boolean
+          description: True if less than 18 holes played, but the score has been scaled up to 18 holes.
+        - name: isMatchPlay
+          in: query
+          schema:
+            type: boolean
+          description: True if competition is a match play.
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum:
+              - NS-NA
+              - NS-A
+              - Illegitimate
+              - DQwithAScore
+              - DQwithoutAScore
+          description: Golfer status in competition as a result of the scores (NS - no show, DQ - disqualified ...).
+        - name: holes 
+          in: query
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                index:
+                  type: integer
+                  description: Index of hole
+                grossStrokes:
+                  type: integer
+                  description: Hole Strokes
+                par:
+                  type: integer
+                  description: Hole Par
+          description: Hole by hole scores.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                score:
+                  $ref: '#/components/schemas/Score'
+              example:
+                id: '301'
+                golferNumber: '10000000'
+                formOfPlay: 'Stroke'
+                courseID: '2659'
+                teeID: '183086'
+                datePlayed: '2019-02-18'
+                scoreType: 'Home'
+                numberOfHoles: 18
+                gender: Male
+                holes:
+                  - index: 1
+                    grossStrokes: 5
+                  - index: 2
+                    grossStrokes: 4
+                  - index: 3
+                    grossStrokes: 5
+                  - index: 4
+                    grossStrokes: 6
+                  - index: 5
+                    grossStrokes: 5
+                  - index: 6
+                    grossStrokes: 4
+                  - index: 7
+                    grossStrokes: 4
+                  - index: 8
+                    grossStrokes: 5
+                  - index: 9
+                    grossStrokes: 4
+                  - index: 10
+                    grossStrokes: 5
+                  - index: 11
+                    grossStrokes: 4
+                  - index: 12
+                    grossStrokes: 4
+                  - index: 13
+                    grossStrokes: 4
+                  - index: 14
+                    grossStrokes: 6
+                  - index: 15
+                    grossStrokes: 5
+                  - index: 16
+                    grossStrokes: 6
+                  - index: 17
+                    grossStrokes: 4
+                  - index: 18
+                    grossStrokes: 4
+      responses:
+        '200':
+          description: Posted scores
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  score:
+                    $ref: '#/components/schemas/Score'
+    get:
+      description: >-
+        Get scores for Golfer between specified dates
+      summary: Get Scores for Golfer
+      tags:
+        - Score
+      parameters:
+        - name: golferNumber
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Golfer ID
+        - name: startDate
+          in: query
+          required: true
+          schema: 
+            type: string
+            format: date
+          description: Start date for scores - "YYYY-MM-DD"
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          description: End date for scores - "YYYY-MM-DD"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    score:
+                      $ref: '#/components/schemas/Score'
+  '/scores/{scoreID}/':
+    get:
+      description: >-
+        Get score by ID
+      summary: Get Score by ID
+      tags:
+        - Score
+      parameters:
+        - name: scoreID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Score ID
+      responses:
+        '200':
+          description: Retrieved scores
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  score:
+                    $ref: '#/components/schemas/Score'
+                example:
+                  id: '302'
+                  golferNumber: '10000000'
+                  formOfPlay: 'Stroke'
+                  courseID: '2659'
+                  teeID: '183086'
+                  datePlayed: '2019-02-20'
+                  scoreType: 'Home'
+                  numberOfHoles: 18
+                  gender: Male
+                  holes:
+                    - index: 1
+                      grossStrokes: 5
+                    - index: 2
+                      grossStrokes: 4
+                    - index: 3
+                      grossStrokes: 5
+                    - index: 4
+                      grossStrokes: 6
+                    - index: 5
+                      grossStrokes: 5
+                    - index: 6
+                      grossStrokes: 4
+                    - index: 7
+                      grossStrokes: 4
+                    - index: 8
+                      grossStrokes: 5
+                    - index: 9
+                      grossStrokes: 4
+                    - index: 10
+                      grossStrokes: 5
+                    - index: 11
+                      grossStrokes: 4
+                    - index: 12
+                      grossStrokes: 4
+                    - index: 13
+                      grossStrokes: 4
+                    - index: 14
+                      grossStrokes: 6
+                    - index: 15
+                      grossStrokes: 5
+                    - index: 16
+                      grossStrokes: 6
+                    - index: 17
+                      grossStrokes: 4
+                    - index: 18
+                      grossStrokes: 4
+        '404':
+          description: Resource not found, no score object with given ID exists
+          content:
+            application/json:
+              schema:
+                type: object
+                  
+    delete:
+      description: >-
+        Delete Score by ID.
+      summary: Delete Score with ID
+      tags:
+        - Score
+      parameters:
+        - name: scoreID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Score ID
+      responses:
+        '200':
+          description: Deleted scores
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  score:
+                    $ref: '#/components/schemas/Score'
+                example:
+                  id: '303'
+                  golferNumber: '10000000'
+                  formOfPlay: 'Stroke'
+                  courseID: '2659'
+                  teeID: '183086'
+                  datePlayed: '2019-02-22'
+                  scoreType: 'Home'
+                  numberOfHoles: 18
+                  gender: Male
+                  holes:
+                    - index: 1
+                      grossStrokes: 5
+                    - index: 2
+                      grossStrokes: 4
+                    - index: 3
+                      grossStrokes: 5
+                    - index: 4
+                      grossStrokes: 6
+                    - index: 5
+                      grossStrokes: 5
+                    - index: 6
+                      grossStrokes: 4
+                    - index: 7
+                      grossStrokes: 4
+                    - index: 8
+                      grossStrokes: 5
+                    - index: 9
+                      grossStrokes: 4
+                    - index: 10
+                      grossStrokes: 5
+                    - index: 11
+                      grossStrokes: 4
+                    - index: 12
+                      grossStrokes: 4
+                    - index: 13
+                      grossStrokes: 4
+                    - index: 14
+                      grossStrokes: 6
+                    - index: 15
+                      grossStrokes: 5
+                    - index: 16
+                      grossStrokes: 6
+                    - index: 17
+                      grossStrokes: 4
+                    - index: 18
+                      grossStrokes: 4
+        '404':
+          description: Resource not found, no score object with given ID exists
+          content:
+            application/json:
+              schema:
+                type: object      
+  # GET SCORES with several params                             
+  '/clubs/':
+    get:
+      description: >-
+        Searches for Club by name and fetches its data
+      summary: Search Club by Name
+      tags:
+        - Club
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The full name of the club
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  club:
+                    $ref: '#/components/schemas/Club'
+              example:
+                id: '2964'
+                name: 'Merion Golf Club'
+                season:
+                  seasonName: 'Active Season'
+                  seasonStartDate: '04-01'
+                  seasonEndDate: '11-14'
+                  isAllYear: false
+                  addresses:
+                    - addressType: 'Physical'
+                      addressLine1: '450 Ardmore Avenue'
+                      city: 'Ardmore'
+                      country: 'US'
+                      state: 'US-PA'
+                      postalCode: '19003'
+                
+  '/clubs/{clubID}/':
+    get:
+      description: >-
+        Fetches a Club's data by their ID and returns their data.
+      summary: Get Club's Data
+      tags:
+        - Club
+      parameters:
+        - name: clubID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Club ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  club:
+                    $ref: '#/components/schemas/Club'
+              example:
+                id: '2964'
+                name: 'Merion Golf Club'
+                season:
+                  seasonName: 'Active Season'
+                  seasonStartDate: '04-01'
+                  seasonEndDate: '11-14'
+                  isAllYear: false
+                  addresses:
+                    - addressType: 'Physical'
+                      addressLine1: '450 Ardmore Avenue'
+                      city: 'Ardmore'
+                      country: 'US'
+                      state: 'US-PA'
+                      postalCode: '19003'
+     
+  '/clubs/{clubID}/courses/':
+    get:
+      description: >-
+        Search Club course by name and fetch Course Data
+      summary: Given a ClubID, retrieve the list of courses associated with the club
+      tags:
+        - Course
+      parameters:
+        - name: clubID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Club ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    course:
+                      $ref: '#/components/schemas/Course'
+              example:
+                - id: '26488'
+                  name: '103 CLUB ATLETICO LOMAS'
+                  clubID: '22009'
+                  clubName: '103 CLUB ATLETICO LOMAS'
+                  fullName: '103 CLUB ATLETICO LOMAS'
+                
+  '/courses/':
+    get:
+      description: >-
+        Search Club course by name and fetch Course Data
+      summary: Search Course by Name
+      tags:
+        - Course
+      parameters:
+        - name: clubID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Club ID
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The full name of the course - will perform a case-insensitive substring match
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    course:
+                      $ref: '#/components/schemas/Course'
+              example:
+                - id: '26488'
+                  name: '103 CLUB ATLETICO LOMAS'
+                  clubID: '22009'
+                  clubName: '103 CLUB ATLETICO LOMAS'
+                  fullName: '103 CLUB ATLETICO LOMAS'
+                
+  '/courses/{courseID}/':
+    get:
+      description: >-
+        Fetches Club course by their ID and returns their data.
+      summary: Get Course with ID
+      tags:
+        - Course
+      parameters:
+        - name: clubID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Club ID
+        - name: courseID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Course ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  course:
+                    $ref: '#/components/schemas/Course'
+              example:
+                id: '26488'
+                name: '103 CLUB ATLETICO LOMAS'
+                clubID: '22009'
+                clubName: '103 CLUB ATLETICO LOMAS'
+                fullName: '103 CLUB ATLETICO LOMAS'
+                
+  '/courses/{courseID}/tees/':
+    get:
+      description: >-
+        Fetches Tees from Course of Club returns their data.
+      summary: Get Tees associated with Course
+      tags:
+        - Tee
+      parameters:
+        - name: clubID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Club ID
+        - name: courseID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Course ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    tee:
+                      $ref: '#/components/schemas/Tee'
+              example:
+                - id: '264881'
+                  name: '103 CLUB ATLETICO LOMAS Tee 1'
+                  date: '2019-05-23'
+                  teeSets:
+                    - teeSetRatingId: '315372'
+                      teeSetRatingName: 'Azul'
+                      gender: Male
+                      holesNumber: 18
+                      totalYardage: 6576
+                      totalMeters: 6013
+                      ratings:
+                        - ratingType: Total
+                          courseRating: 71.6
+                          slopeRating: 127.0
+                          bogeyRating: 95.2
+                        - ratingType: Front
+                          courseRating: 35.7
+                          slopeRating: 127.0
+                          bogeyRating: 47.5
+                        - ratingType: Back
+                          courseRating: 35.9
+                          slopeRating: 127.0
+                          bogeyRating: 47.7
+                    - teeSetRatingId: '315375'
+                      teeSetRatingName: 'Blanco'
+                      gender: Male
+                      holesNumber: 18
+                      totalYardage: 6291
+                      totalMeters: 5752
+                      ratings:
+                        - ratingType: Total
+                          courseRating: 69.9
+                          slopeRating: 127.0
+                          bogeyRating: 93.7
+                        - ratingType: Front
+                          courseRating: 35.0
+                          slopeRating: 127.0
+                          bogeyRating: 46.8
+                        - ratingType: Back
+                          courseRating: 34.9
+                          slopeRating: 127.0
+                          bogeyRating: 46.6
+                    - teeSetRatingId: '315376'
+                      teeSetRatingName: 'Rojo'
+                      gender: Female
+                      holesNumber: 18
+                      totalYardage: 5556
+                      totalMeters: 5080
+                      ratings:
+                        - ratingType: Total
+                          courseRating: 72.1
+                          slopeRating: 126.0
+                          bogeyRating: 101.6
+                        - ratingType: Front
+                          courseRating: 36.5
+                          slopeRating: 126.0
+                          bogeyRating: 51.3
+                        - ratingType: Back
+                          courseRating: 35.6
+                          slopeRating: 125.0
+                          bogeyRating: 50.3
+                
+  '/tees/{teeID}/':
+    get:
+      description: >-
+        Fetches Tee with ID from Course of Club returns its data.
+      summary: Get Tee with ID
+      tags:
+        - Tee
+      parameters:
+        - name: clubID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Club ID
+        - name: courseID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Course ID
+        - name: teeID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Tee ID
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Date
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tee:
+                    $ref: '#/components/schemas/Tee'
+              example:
+                id: '264881'
+                name: '103 CLUB ATLETICO LOMAS Tee 1'
+                date: '2019-05-23'
+                teeSets:
+                  - teeSetRatingId: '315372'
+                    teeSetRatingName: 'Azul'
+                    gender: Male
+                    holesNumber: 18
+                    totalYardage: 6576
+                    totalMeters: 6013
+                    ratings:
+                      - ratingType: Total
+                        courseRating: 71.6
+                        slopeRating: 127.0
+                        bogeyRating: 95.2
+                      - ratingType: Front
+                        courseRating: 35.7
+                        slopeRating: 127.0
+                        bogeyRating: 47.5
+                      - ratingType: Back
+                        courseRating: 35.9
+                        slopeRating: 127.0
+                        bogeyRating: 47.7
+                  - teeSetRatingId: '315375'
+                    teeSetRatingName: 'Blanco'
+                    gender: Male
+                    holesNumber: 18
+                    totalYardage: 6291
+                    totalMeters: 5752
+                    ratings:
+                      - ratingType: Total
+                        courseRating: 69.9
+                        slopeRating: 127.0
+                        bogeyRating: 93.7
+                      - ratingType: Front
+                        courseRating: 35.0
+                        slopeRating: 127.0
+                        bogeyRating: 46.8
+                      - ratingType: Back
+                        courseRating: 34.9
+                        slopeRating: 127.0
+                        bogeyRating: 46.6
+                  - teeSetRatingId: '315376'
+                    teeSetRatingName: 'Rojo'
+                    gender: Female
+                    holesNumber: 18
+                    totalYardage: 5556
+                    totalMeters: 5080
+                    ratings:
+                      - ratingType: Total
+                        courseRating: 72.1
+                        slopeRating: 126.0
+                        bogeyRating: 101.6
+                      - ratingType: Front
+                        courseRating: 36.5
+                        slopeRating: 126.0
+                        bogeyRating: 51.3
+                      - ratingType: Back
+                        courseRating: 35.6
+                        slopeRating: 125.0
+                        bogeyRating: 50.3
+
+  '/courses/{courseID}/pccAtDate/':
+    get:
+      description: >-
+        Get PCC Calculation for a Course at a Date
+      summary: Get PCC Calculation for a Course at a Date
+      tags:
+        - PCC
+      parameters:
+        - name: courseID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Course ID
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Date - "YYYY-MM-DD"
+      responses:
+        '200':
+          description: OK, with a number from -1, 0, 1, 2 specifying the playing course conditions adjustment 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  playingCourseConditions: 
+                    $ref: '#/components/schemas/PCC'
+              example:
+                value: -1
+        '404':
+          description: The PCC was not calculated for the selected date
+              
+
+tags:
+  - name: Golfer
+    description: Golfer Search Methods
+  - name: Handicap
+    description: Handicap Retrieval Methods
+  - name: Score
+    description: Score Post and Retrieval Methods
+  - name: Club
+    description: Club Retrieval Methods
+  - name: Course
+    description: Course Retrieval Methods
+  - name: Tee
+    description: Tee and Hole Retrieval Methods
+  - name: PCC
+    description: Playing Condition Calculation Retrieval Methods
+
+# COMPONENTS
+
+components:
+  schemas:
+    Golfer:
+      type: object
+      properties:
+        golferNumber:
+          type: string
+          description: Unique Golfer ID within the National Association
+        firstName:
+          type: string
+          description: First name of Golfer
+        lastName:
+          type: string
+          description: Last name of Golfer
+        gender:
+          type: string
+          enum: [Male, Female]
+          description: Golfer gender
+        country:
+          type: string
+          description: Country of Golfer (ISO 3166-1 alpha-2)
+        state:
+          type: string
+          description: State of Golfer (ISO 3166-2:US)
+        city:
+          type: string
+          description: City of Golfer
+        handicapIndex:
+          type: number
+          description: Current handicap index of golfer using 1 decimal and denote + handicaps as negative numbers (e.g., -1.2, 15.7)
+        handicapIndexDisplay:
+          type: string
+          description: Preferred method of displaying this golfer's current handicap index (e.g., "+1.2", "15.7")
+        lowHandicapIndex:
+          type: number
+          description: Lowest handicap of Golfer in last 12 months using 1 decimal and denote + handicaps as negative numbers (e.g., -1.2, 15.7)
+        lowHandicapIndexDisplay:
+          type: string
+          description: Preferred method of displaying this golfer's low handicap index (e.g., "+1.2", "15.7")
+    HandicapRevision:
+      type: object
+      properties:
+        golferNumber:
+          type: string
+          description: Unique Golfer ID within the National Association
+        date:
+          type: string
+          format: date
+          description: Date of Revision using the "YYYY-MM-DD" format (e.g., "2020-05-18")
+        handicapIndex:
+          type: number
+          description: Handicap Index of golfer at revision using 1 decimal and denote + handicaps as negative numbers (e.g., -1.2, 15.7)
+        handicapIndexDisplay:
+          type: string
+          description: Preferred method of displaying this golfer's handicap index at this revision (e.g., "+1.2", "15.7")
+        lowHandicapIndex:
+          type: number
+          description: Lowest handicap of Golfer in last 12 months prior to revision date using 1 decimal and denote + handicaps as negative numbers (e.g., -1.2, 15.7)
+        lowHandicapIndexDisplay:
+          type: string
+          description: Preferred method of displaying this golfer's low Handicap Index at this revision (e.g., "+1.2", "15.7")
+        numberOfScores:
+          type: integer
+          description: Total number of scores composing the revision (e.g., 20 for a fully developed handciap)
+        usedScores:
+          type: array
+          items:
+            type: string # ID of Score
+          description: List of score IDs used for computing the handicap (e.g., array of 8 IDs for a fully developed handicap)
+        availableScores:
+          type: array
+          items:
+            type: string # ID of Scores
+          description: List of score IDs available for computing the handicap (e.g., array of 20 IDs for a fully developed handicap)
+    Score:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Score ID
+        golferNumber:
+          type: string
+          description: Unique Golfer ID within the National Association
+        formOfPlay:
+          type: string
+          enum:
+            - Stroke
+            - Stableford
+            - Par / Bogey
+          description: Type of competition
+        courseID:
+          type: string
+          description: Course ID
+        teeID:
+          type: string
+          description: Tee ID
+        datePlayed:
+          type: string
+          format: date
+          description: Date of competition - "YYYY-MM-DD"
+        scoreType:
+          type: string
+          enum: [Home, Away, Tournament]
+          description: Score type
+        numberOfHoles:
+          type: integer
+          enum: [9,18]
+          description: Number of holes
+        gender:
+          type: string
+          enum: [Male, Female]
+          description: Golfer gender
+        courseRating:
+          type: number
+          description: Course rating (e.g., 71.2)
+        slopeRating:
+          type: integer
+          description: Slope rating (e.g., 135)
+        par:
+          type: integer
+          description: Par of played tee (e.g., 72)
+        courseHandicap:
+          type: integer
+          description: Course handicap
+        PCC:
+          type: integer
+          description: An integer in the set {-1, 0, 1, 2, 3}
+        playingHandicap:
+          type: integer
+          description: Playing handicap
+        competitionScore:
+          type: integer
+          description: Stableford points, Quota points, Net score - dependent on the competition type.
+        adjustedGrossScore:
+          type: integer
+          description: Score used for handicapping purposes
+        isArtificialScore:
+          type: boolean
+          description: True if score is only used for setting the initial handicap index.
+        isRecreationalScore:
+          type: boolean
+          description: True if score is not from an official competition.
+        isScaled:
+          type: boolean
+          description: True if golfer played less than 18 holes, but the score is scaled up to 18 holes.
+        isMatchPlay:
+          type: boolean
+          description: True if competition is a match play.
+        competitionStatus:
+          type: string
+          enum:
+            - NS-NA
+            - NS-A
+            - Illegitimate
+            - DQwithAScore
+            - DQwithoutAScore
+          description: Golfer status in competition as a result of the scores (NS - no show, DQ - disqualified ...).
+        holes:
+          type: array
+          items:
+            type: object
+            properties:
+              index:
+                type: integer
+                description: Index of hole
+              grossStrokes:
+                type: integer
+                description: Score on given hole
+              par:
+                type: integer
+                description: Par on given hole
+          description: Hole by hole scores.
+    Club:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Club ID
+        name:
+          type: string
+          description: Club Name
+        seasons:
+          type: array
+          items:
+            type: object
+            properties:
+              seasonStartDate:
+                type: string
+                format: date
+                description: Season start date - "MM-DD"
+              seasonEndDate:
+                type: string
+                format: date
+                description: Season end date - "MM-DD"
+              isAllYear:
+                type: boolean
+                description: True if season is all year
+          description: List of Seasons
+        street:
+          type: string
+          description: Number and street
+        city:
+          type: string
+          description: City
+        country:
+          type: string
+          description: Country (ISO 3166-1 alpha-2)
+        state:
+          type: string
+          description: State (ISO 3166-2:US)
+        postalCode:
+          type: string
+          description: Postal Code
+    Course:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Course ID
+        name:
+          type: string
+          description: Course Name (e.g., West Course)
+        clubID:
+          type: string
+          description: Club ID
+        clubName:
+          type: string
+          description: Club Name (e.g., Merion Golf Club)
+        fullName:
+          type: string
+          description: Full name of the club & course (e.g., Merion Golf Club - West Course)
+    Tee:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Tee ID
+        courseID:
+          type: string
+          description: Course ID
+        name:
+          type: string
+          description: Tee Name (e.g, Black)
+        gender:
+          type: string
+          enum: [Male, Female]
+          description: Denotes whether this tee is a Male or Female tee
+        sides:
+          type: array
+          items:
+            type: object
+            properties:
+              side:
+                type: string
+                enum: [Total, Front, Back]
+                description: What side of the tee is the rating for
+              numberOfHoles:
+                type: integer
+                description: Number of holes (e.g., 9, 18)
+              totalYardage:
+                type: number
+                format: float
+                description: Total yardage
+              totalMeters:
+                type: number
+                format: float
+                description: Total meters
+              courseRating:
+                type: number
+                format: float
+                description: Course rating
+              slopeRating:
+                type: number
+                format: float
+                description: Slope rating
+              bogeyRating:
+                type: number
+                format: float
+                description: Bogey rating
+    PCC:
+      type: object
+      properties:
+        courseID:
+          type: string
+          description: Course ID
+        date:
+          type: string
+          format: date
+          description: Date of PCC - "YYYY-MM-DD"
+        value:
+          type: integer
+          description: An integer in the set {-1, 0, 1, 2, 3}

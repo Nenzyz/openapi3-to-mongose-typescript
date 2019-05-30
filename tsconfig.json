@@ -1,12 +1,14 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+      "baseUrl": ".",
+      "paths": { "*": ["types/*"] },
     "target": "es2015",
     "module": "commonjs",
     "esModuleInterop": true,
     "sourceMap": true,
     "moduleResolution": "node",
-    "outDir": "dist",
+    "outDir": "lib",
     "typeRoots": ["node_modules/@types"]
   },
   "include": ["typings.d.ts", "src/**/*.ts"],

@@ -1,0 +1,1413 @@
+openapi: 3.0.0
+# Added by API Auto Mocking Plugin
+servers:
+  - description: Vision 360 Test
+    url: https://virtserver.swaggerhub.com/amedeeGarin/Vision360_EXT/1.0.0
+info:
+  description: API to exploit vision 360
+  version: "1.0.0"
+  title: Vision 360
+  contact:
+    email: customer-success@universign.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: admins
+    description: Secured Admin-only calls
+  - name: developers
+    description: Operations available to regular developers
+paths:
+  /authenticate:
+    post:
+      summary: logs in and returns the authentication cookie
+      requestBody:
+        required: true
+        description: A JSON object containing the login and password.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Authentication'
+      security: []
+      responses:
+        '200':
+          description: >
+            Successully authenticated.
+            The session ID is returned in a cookie named `JSESSIONID`. You need to include this cookie in subsequent requests.
+          headers:
+            Set-Cookie:
+              description: JSESSIONID cookie
+              schema:
+                type: string
+                example: JSESSIONID=2QZoBes-Tog153SeG4BqM7NaFer_P98s_gW8RihR; path=/; HttpOnly
+            "\0Set-Cookie":
+              description: XSRF token
+              schema:
+                type: string
+                example: XSRF-TOKEN=7426b13e-914c-4660-aa1f-7bb4f8f79555; path=/
+            "\nSet-Cookie":
+              description: remember-me cookie
+              schema:
+                type: string
+                example: remember-me=TElUejNBWEg2T2pUalJBMmR5Nng6Q050Tld0Z1VVTUFlN25vZUlkQTg; path=/; Max-Age=2678400; Expires=Fri, 21-Jun-2019 08:02:05 GMT; HttpOnly
+  /customers:
+    get:
+      security:
+        - cookieAuth: []
+      tags:
+        - developers
+      summary: searches customer
+      operationId: searchCustomer
+      description: |
+        By calling this method, you can access to the customers.
+      parameters:
+        - in: query
+          name: totalPages
+          description: number of pages of customers.
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+        - in: query
+          name: totalElements
+          description: number of elements to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Customer'
+        '400':
+          description: bad input parameter
+  /customers/{customerId}:
+    get:
+      security:
+        - cookieAuth: []
+      tags:
+        - developers
+      summary: returns an user by ID.
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          description: Paramter description in COmmnMArk or HTML.
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses: 
+        '200':
+          description : OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CustomerDetails'
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: JSESSIONID
+  schemas:
+    Authentication:
+      type: object
+      required:
+        - login
+        - password
+        - rememberMe
+    Customer:
+      type: object
+      required:
+        - id
+        - name
+        - owner
+        - industry
+        - companyType
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 254
+        name:
+          type: string
+          example: Acme Corp
+        owner:
+          type: string
+          example: Jean Dupont
+        industry:
+          type: string
+          example: Banque
+        companyType:
+          type: string
+          example: Active Customer  
+    CustomerDetails:
+      type: object
+      required:
+        - id
+        - name
+        - owner
+        - industry
+        - companyType
+        - crm
+        - billing
+        - ppm
+        - ticketing
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 254
+        name:
+          type: string
+          example: Acme Corp
+        owner:
+          type: string
+          example: Jean Dupont
+        industry:
+          type: string
+          example: Banque
+        companyType:
+          type: string
+          example: Active Customer
+        crm:
+          $ref: '#/components/schemas/Crm'
+        billing:
+          $ref: '#/components/schemas/Billing'
+        ppm:
+          $ref: '#/components/schemas/Ppm'
+        ticketing: 
+          $ref: '#/components/schemas/Ticketing'
+    Ticketing:
+      properties:
+        organization:
+          type: object
+          properties:
+            id:
+              type: integer
+              description: ''
+            externalId:
+              type: string
+              description: ''
+            url:
+              type: string
+              description: 'The API url of this organization'
+            name:
+              type: string
+              description: ''
+            created_at:
+              type: string
+              description: ''
+            updated_at:
+              type: string
+              description: ''
+            domain_names:
+              type: array
+              items:
+                type: string
+              description: ''  
+            details: 
+              type: string
+              description: ''
+            notes: 
+              type: string
+              description: ''
+            group_id:
+              type: integer
+              descrption: ''
+            shared_tickets:
+              type: boolean
+              description: ''
+            shared_comments:
+              type: boolean
+              descrption: ''
+            tags: 
+              type: array
+              items:
+                type: string
+              description: ''  
+            organization_fields:
+              type: string
+              description: ''
+      type: object
+    Billing:
+      properties:
+        siret:
+          type: string
+          example: '45678912311'
+        description:
+          type: string
+        id:
+          type: string
+        isParticular:
+          type: boolean
+        lastUpdate:
+          type: string
+        partner:
+          type: boolean
+        partnerId: 
+          type: string
+        name:
+          type: string
+        ownerId:
+          type: string
+        personReferers:
+          type: array
+          items:
+            $ref: '#/components/schemas/personReferer'
+        invoices:
+          type: array
+          items:
+            $ref: '#/components/schemas/invoice'
+        subscriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/subscription'
+        taxNo: 
+          type: string
+        thirdPartyAccountingCode:
+          type: string
+        usages:
+          type: array
+          items: 
+            $ref: '#/components/schemas/usage'
+      type: object
+    Ppm:
+      required:
+       - customer
+      properties:
+        customer:
+          type: object
+          properties:
+            Name:
+              type: string
+              example: 'ACME CORP'
+            C_ClientChefdeprojet:
+              type: string
+            C_ClientCRMId:
+              type: string          
+            C_ClientIntgrateur:
+              type: string
+            C_ClientPartenaire:
+              type: string
+            Owner:
+              $ref: '#/components/schemas/User'
+            AccountStatus:
+              type: array
+              items:
+                type: string
+            CreatedOn:
+              type: string
+              format: date-time
+            CreatedBy:
+              $ref: '#/components/schemas/User'
+            LastUpdatedOn:
+              type: string
+            LastUpdatedBy:
+              $ref: '#/components/schemas/User' 
+            Description:
+              type: string
+            State:
+              type: array
+              items:
+                type: string
+            SYSID:
+              type: string
+            projects:
+              type: array
+              items:
+                $ref: '#/components/schemas/Project'
+            contacts:
+              type: array
+              items:
+                $ref: '#/components/schemas/C_Contactprojet'
+            requests:
+              type: array
+              items: 
+                $ref: '#/components/schemas/EnhancementRequest'
+            domainNames:
+              type: array
+              items:
+                $ref: '#/components/schemas/C_NomdeDomaine'
+            organizations:
+              type: array
+              items:
+                $ref: '#/components/schemas/C_Organisation'
+    Project:
+      type: object
+      properties:
+        C_ProjetAlerte:
+          type: string
+        C_ProjetOSCommentaires:
+          type: string
+        C_ProjetBillingOK:
+          type: boolean
+        C_ProjetClientBloqueur:
+          type: boolean
+        C_ProjetCommentaires:
+          type: string
+        C_ProjectAccountOwnerWINew:
+          type: string
+        C_ProjetCptTechniquesduclient:
+          type: array
+          items:
+            type: string
+        C_ProjetEnvoiconsoR7:
+          type: boolean
+        C_ProjetBdCsigne:
+          type: array
+          items:
+            type: string
+        C_ProjetBdCsignle:
+          type: string
+          format: date-time
+        C_ProjetCourrielsOff:
+          type: boolean
+        C_AllCreated4CdP:
+          type: boolean
+        C_ProjetDateservicedemande:
+          type: string
+          format: date-time
+        C_ProjetDlaisduprojet:
+          type: array
+          items: 
+            type: string
+        C_ProjetEnvDbut:
+          type: array
+          items:
+            type: string
+        C_ProjetEnvironnementProd:
+          type: boolean
+        C_ProjetEnvironnementR7:
+          type: boolean
+        C_ProjetEtatProjet:
+          type: array
+          items: 
+            type: string
+        C_ProjectFlashReport:
+          type: string 
+        C_ProjetFonctionMetierSponsor:
+          type: array
+          items:
+            type: string
+        C_ProjectProdIDOrga:
+          type: string
+        C_ProjetImport:
+          type: boolean
+        C_ProjetIntgrateur:
+          type: boolean
+        C_ProjetLangagedIntgration:
+          type: array
+          items:
+            type: string
+        C_ProjetLangage:
+          type: array
+          items:
+            type: string
+        C_ProjetLicenceCUTEsignee:
+          type: array
+          items:
+            type: string
+        C_ProjetLicenceCUTEsignele:
+          type: string
+          format: date-time
+        C_ProjetLienConfluence:
+          type: string
+          format: url
+        C_ProjetLiencontractuel:
+          type: array
+          items:
+            type: string
+        C_ProjetListeCourriels:
+          type: array
+          items:
+            type: string
+        C_ProjectCourrielContact:
+          type: string
+        C_ProjetMaturitduclient:
+          type: array
+          items:
+            type: string
+        C_ProjectDateMeP:
+          type: string
+          format: date-time
+        C_ProjectDateMeR:
+          type: string
+          format: date-time
+        C_ProjetMeR2MePd:
+          type: string
+        C_ProjetMeR2MeSd:
+          type: string
+        C_ProjectDateMeS:
+          type: string
+          format: date-time
+        C_ProjectMeteo:
+          type: array
+          items:
+            type: string
+        C_ProjetEnvoiConsoProd:
+          type: boolean
+        C_ProjetMotifderejet:
+          type: string
+        C_ProjetMotifderequalification:
+          type: string
+        C_ProjectProdNomOrga:
+          type: string
+        C_ProjetOEDCommentaires:
+          type: string
+        C_ProjectOEDCustomisation:
+          type: boolean
+        C_Project_OEDSite:
+          type: array
+          items:
+            type: string
+        C_ProjectOEDSousProjets:
+          type: boolean
+        C_ProjetParamtrageR7valide:
+          type: boolean
+        C_ProjetPartenaire:
+          type: boolean
+        C_ProjectProdadresseAdminOrga:
+          type: string
+        C_ProjetProdCSConso:
+          type: boolean
+        C_ProjetProdCSPackDure:
+          type: integer
+        C_ProjetProdCSPackQuantit:
+          type: integer
+        C_ProjetProdHorodatageConso::
+          type: boolean
+        C_ProjetProdHorodatagePackDure:
+          type: integer
+        C_ProjetProdHorodatagePackQuantit:
+          type: integer
+        C_ProjetProdSEConso:
+          type: boolean
+        C_ProjetProdSEPackDure:
+          type: integer
+        C_ProjetProdSEPackQuantit:
+          type: integer
+        C_ProjectR7AdresseAdminOrga01:
+          type: string
+        C_ProjetR7ConsoCS:
+          type: string
+        C_ProjetR7ConsoDure:
+          type: string
+        C_ProjetR7ConsoSE:
+          type: string
+        C_ProjetR7ConsoTS:
+          type: string
+        C_ProjectReportingClassic:
+          type: boolean
+        C_ProjectReportingPersonnalis:
+          type: boolean
+        C_ProjetRequalification:
+          type: boolean
+        C_ProjetRequalifi:
+          type: boolean
+        C_ProjetScoredelademande:
+          type: integer
+        C_ProjetServeur:
+          type: string
+        C_ProjectSTCommentaires:
+          type: string
+        C_ProjetSponsorduprojet:
+          type: array
+          items:
+            type: string
+        C_ProjectST_API:
+          type: boolean
+        C_ProjectST_CachetServeur:
+          type: boolean
+        C_ProjectSTCampagneSignature:
+          type: boolean
+        C_ProjectST_CSSOnPdS:
+          type: boolean
+        C_ProjectTST_CUTE:
+          type: boolean
+        C_ProjectST_DeprecatedOption:
+          type: boolean
+        C_ProjectSTGoogleAnalytics:
+          type: boolean
+        C_ProjectST_Horodatage:
+          type: boolean
+        C_ProjectST_IFrame:
+          type: boolean
+        C_ProjetSTOAuth:
+          type: boolean
+        C_ProjectST_PageDeSignature:
+          type: array
+          items:
+            type: string
+        C_ProjectST_PortailWEB:
+          type: boolean
+        C_ProjectST_SDKIOS:
+          type: boolean
+        C_ProjectST_SDKJAVA:
+          type: boolean
+        C_ProjectSTSignatureN1:
+          type: boolean
+        C_ProjectSTSignatureN2:
+          type: boolean
+        C_ProjectSTSignatureN3:
+          type: boolean
+        C_ProjectST_SolutionHadoc:
+          type: boolean
+        PercentCompleted:
+          type: integer
+        CreatedOn:
+          type: string
+          format: date-time
+        CreatedBy:
+          type: string
+          format: date-time
+        StartDate:
+          type: string
+          format: date-time
+        DueDate:
+          type: string
+          format: date-time
+        Description:
+          type: string
+        Duration:
+          type: string
+        ActualEffort:
+          type: string
+        ActualEffortUpdatedFromTimesheets:
+          type: boolean
+        RemainingEffort:
+          type: string
+        State:
+          type: array
+          items:
+            type: string
+        Billable:
+          type: boolean
+        SYSID:
+          type: string
+        ExternalID:
+          type: string
+        Name:
+          type: string
+        Parent:
+          type: string
+        Phase:
+          type: array
+          items:
+            type: string
+        WorkPolicy:
+          type: array
+          items:
+            type: string
+        IsPortfolio:
+          type: boolean
+        ProjectManager:
+          $ref: '#/components/schemas/User'
+        ProjectType:
+          type: array
+          items:
+            type: string
+        Project:
+          type: string
+        ParentProject:
+          type: string
+        Reportable:
+          type: boolean
+        Manager:
+          $ref: '#/components/schemas/User'
+        TrackStatus:
+          type: array
+          items:
+            type: string
+        Work:
+          type: string
+        requests:
+          type: array
+          items:
+            $ref: '#/components/schemas/EnhancementRequest'
+        organizations:
+          type: array
+          items:
+            $ref: '#/components/schemas/C_Organisation'
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/GenericTask'
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/C_Contactprojet'
+    C_Organisation:
+      type: object
+      properties:
+        C_OrgaAdresseAdminOrga:
+          type: string
+        C_OrgaAdresseTech:
+          type: string
+        C_OrgaEnvironnement:
+          type: array
+          items:
+            type: string
+        C_OrgaIDOrga:
+          type: string
+        CreatedOn:
+          type: string
+          format: date-time
+        CreatedBy:
+          type: string
+        lastUpdatedOn:
+          type: string
+        lastUpdatedBy:
+          type: string
+        Description:
+          type: string
+        SYSID:
+          type: string
+        ExternalId:
+          type: string
+        Name:
+          type: string
+        Owner:
+          type: string   
+    C_Contactprojet:
+      type: object
+      properties:
+        C_ContactProjetAdressecourriel:
+          type: string
+        C_ContactProjetFonction:
+          type: string
+        C_ContactProjetPrnom:
+          type: string
+        C_ContactProjetTelfixe:
+          type: string
+        C_ContactProjetTelmobile:
+          type: string
+        CreatedOn:
+          type: string
+          format: date-time
+        CreatedBy:
+          type: string
+        lastUpdatedOn:
+          type: string
+        lastUpdatedBy:
+          type: string
+        Description:
+          type: string
+        SYSID:
+          type: string
+        ExternalId:
+          type: string
+        Name:
+          type: string
+        Owner:
+          type: string  
+    User:
+      type: object
+      properties:
+        C_ClientEmployeur:
+          type: string
+        Admin:
+          type: boolean
+        Financial:
+          type: boolean
+        AllowEmails:
+          type: boolean
+        CreatedBy:
+          type: string
+          format: date-time
+        CreatedOn:
+          type: string
+          format: date-time
+        Email:
+          type: string
+        State:
+          type: array
+          items:
+            type: string
+        Language:
+          type: array
+          items:
+            type: string
+        DisplayName:
+          type: string
+        LastName:
+          type: string
+        UserName:
+          type: string
+        FirstName:
+          type: string
+        Profile:
+          $ref: ''
+        DirectManager:
+          $ref: ''
+        SuperUser:
+          type: boolean
+        LicenseType:
+          type: array
+          items:
+            type: string
+    GenericTask:
+      type: object
+      properties:
+        C_TaskCahierdeParamtrage:
+          type: string
+        C_TaskCallback:
+          type: string
+        C_TaskContenuduSMS:
+          type: string
+        C_AllCreated4CdP:
+          type: boolean
+        C_TaskDcision:
+          type: array
+          items:
+            type: string
+        C_TaskMailAdmin1:
+          type: string
+        C_TaskMailAdmin2:
+          type: string
+        C_TaskMailAdmin3:
+          type: string
+        C_TaskMailAdminOrgaSource:
+          type: string
+        C_TaskMailAdminOrganisationCible:
+          type: string
+        C_TaskNomsdesProfils:
+          type: string
+        C_TaskNombredeProfil:
+          type: integer
+        C_TaskOrganisation1:
+          type: string
+        C_TaskOrganisation2:
+          type: string
+        C_TaskOrganisation3:
+          type: string
+        C_TaskOrganisationCible:
+          type: string
+        C_TaskOrganisationSource:
+          type: string
+        C_TaskPrsentiel:
+          type: boolean
+        C_TaskTypeDelegation:
+          type: array
+          items:
+            type: string
+        C_TaskTypedeDuplication:
+          type: array
+          items:
+            type: string
+        C_TaskTypedeMail:
+          type: array
+          items:
+            type: string
+        C_TaskTypeprestasupport:
+          type: array
+          items:
+            type: string
+        C_TaskTypedeProfil:
+          type: array
+          items:
+            type: string
+        C_TaskTypeActivationTache:
+          type: array
+          items:
+            type: string
+        C_TaskURLderedirection:
+          type: string
+        AssignedTo:
+          $ref: ''
+        AssignmentDate:
+          type: string
+        Comment:
+          type: string
+        CreatedOn:
+          type: string
+        CreatedBy:
+          $ref: ''
+        DueDate:
+          type: string
+        LastUpdatedOn:
+          type: string
+        LastUpdatedBy:
+          $ref: ''
+        Description:
+          type: string
+        State:
+          type: array
+          items:
+            type: string
+        SYSID:
+          type: string
+        Owner:
+          $ref: ''
+        PlannedFor:
+          $ref: ''
+        ReportedBy:
+          $ref: ''
+        RequestType:
+          type: array
+          items:
+            type: string
+    C_NomdeDomaine:
+      type: object
+      properties:
+        CreatedOn:
+          type: string
+        CreatedBy:
+          type: string
+        LastUpdateOn:
+          type: string
+        Description:
+          type: string
+        SYSID:
+          type: string
+        ExternalId:
+          type: string
+        Name:
+          type: string
+        Owner:
+          type: string
+    EnhancementRequest:
+      type: object
+      properties:
+        C_DemandeAlerte:
+          type: string
+        C_DemandeCommentaires:
+          type: string
+        C_DemandeAccountOwner:
+          type: string
+        C_DemandeCptTechniquesduclient:
+          type: string
+        C_DemandeCourrielContact:
+          type: string
+        C_DemandeContactFixe: 
+          type: string
+        C_DemandeContactFonction: 
+          type: string
+        C_DemandeMobileContact:
+          type: string
+        C_DemandeContactNom:
+          type: string
+        C_DemandePrenomNomContact:
+          type: string
+        C_DemandeBdCsigne:
+          type: array
+          items:
+            type: string
+        C_DemandeCourrielsOff:
+          type: boolean
+        C_DemandeDateDebutCdP:
+          type: string
+          format: date-time
+        C_DemandeDcision:
+          type: array
+          items:
+            type: string
+        C_DemandeDcisionvariable:
+          type: array
+          items:
+            type: string
+        C_DemandeDlaisduprojet:
+          type: array
+          items:  
+            type: string
+        C_Demandedure:
+          type: string
+        C_Demande_Environnement:
+          type: array
+          items:
+            type: string
+        C_DemandePossedeProd:
+          type: boolean
+        C_DemandePossedeR7:
+          type: boolean
+        C_DemandeEtatProjet:
+          type: string
+        C_DemandeFacturable:
+          type: boolean
+        C_DemandeFaitsMarquants:
+          type: string
+        C_DemandeFonctionMetierSponsor:
+          type: array
+          items:
+            type: string
+        C_DemandeIntgrateur:
+          type: boolean
+        C_DemandeLangage:
+          type: array
+          items:
+            type: string
+        C_DemandeMaturitduclient:
+          type: array
+          items:
+            type: string
+        C_DemandeMeteoProjet:
+          type: string
+        C_DemandeMotifdelannulation:
+          type: string
+        C_DemandeMotifRejet:
+          type: string
+        C_DemandePartenaire:
+          type: boolean
+        C_DemandePrsentiel:
+          type: boolean
+        C_DemandeR7ConsoCachetServeur:
+          type: array
+          items:
+            type: string
+        C_DemandeR7ConsoDuree:
+          type: array
+          items: 
+            type: string
+        C_DemandeR7ConsoHorodatage:
+          type: array
+          items:
+            type: string
+        C_DemandeR7ConsoSignElec:
+          type: array
+          items:
+            type: string
+        C_DemandeRenvoidecourriel:
+          type: array
+          items:
+            type: string
+        C_DemandeScore:
+          type: integer
+        C_DemandeStatutduclient:
+          type: array
+          items:
+            type: string
+        C_DemandePrestaCdP:
+          type: array
+          items: 
+            type: string
+        C_DemandeTypePrestaSupport:
+          type: array
+          items:
+            type: string
+        C_DemandeTypedeprojet:
+          type: array
+          items:
+            type: string
+        ActualEffort:
+          type: string
+        Billable:
+          type: boolean
+        CreatedBy:
+          type: string
+          format: date-time
+        CreatedOn:
+          type: string
+          format: date-time
+        Description:
+          type: string
+        DueDate:
+          type: string
+          format: date-time
+        Duration:
+          type: string
+        Importance:
+          type: array
+          items:
+            type: string
+        Manager:
+          $ref: '#/components/schemas/User'
+        Name:
+          type: string
+        Parent:
+          $ref: ''
+        ParentProject:
+          $ref: ''
+        PercentCompleted:
+          type: integer
+        Phase:
+          type: array
+          items:
+            type: string
+        Project:
+          $ref: '#/components/schemas/Project'
+        RemainingEffort:
+          type: string
+        Reportable:
+          type: boolean
+        StartDate:
+          type: string
+          format: date-time
+        State:
+          type: array
+          items:
+            type: string
+        SYSID:
+          type: string
+        TaskType:
+          type: array
+          items:
+            type: string
+        TrackStatus:
+          type: array
+          items:
+            type: string
+        Work:
+          type: string
+        WorkPolicy:
+          type: array
+          items:
+            type: string
+    Crm:
+      properties:
+        contacts:
+          type: object
+          properties:
+            name:
+              type: string
+              example: Marie Dupont
+            phone: 
+              type: string
+              example: 01 25 48 79 96
+            email: 
+              type: string
+              example: marie.dupont@acme-corp.com
+            jobTitle:
+              type: string
+              example: Product Manager
+        address:
+          type: string
+          example: '5 rue du faubourg Poissonnière Paris 75009'
+      type: object
+    subscription:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name: 
+          type: string
+        description:
+          type: string
+        freeMonths:   
+          type: integer  
+        lastUpdate:
+          type: string
+          format: date-time
+        invoiceItemDateds:
+          type: string
+        commercialName:
+          type: string
+        ratePlans:
+          type: array
+          items:
+            type: object
+            properties:
+              activationDate:
+                type: string
+              base:
+                type: integer
+              commercialName:
+                type: string
+              description:
+                type: string
+              discountBase:
+                type: number
+                format: double
+              discountUnitPrice:
+                type: number
+                format: double
+              endDate: 
+                type: string
+              features:
+                type: string
+              fixedPrice:
+                type: boolean
+              id:
+                type: string
+              lastUpdate:
+                type: string
+              name:
+                type: string
+              product:
+                type: object
+                properties:
+                  commercialName:
+                    type: string
+                  description: 
+                    type: string
+                  id:
+                    type: string
+                  lastUpdate:
+                    type: string
+                  matrix: 
+                    type: string
+                  name:
+                    type: string
+                  productType:
+                    type: string
+                  settings:
+                    type: string
+              productRatePlanCharge:
+                type: string
+              prorata:
+                type: string
+              ratePlanCharges:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    step:
+                      type: number
+                      format: double
+                    unitPrice:
+                      type: number
+                      format: double
+                    discount:
+                      type: number
+                      format: double
+              ratePlanId:
+                type: string
+              standardModel: 
+                type: boolean
+              subscriptionFeatures:
+                type: string
+              unitsIncluded: 
+                type: integer
+              unitsIncludedDuration:
+                type: integer
+              unitsIncludePrice:
+                type: integer
+              version:
+                type: string
+        subscriptionFeatures:
+          type: string
+        usages:
+          type: array
+          items:
+            $ref: '#/components/schemas/usage'
+        version:
+          type: string
+    personReferer:
+          type: object
+          properties:
+            name:
+              type: string
+              example: John Bridge
+            email:
+              type: string
+              example: john.bridge@acme-corp.com
+            phone:
+              type: string
+              example: 3365859478
+            job:
+              type: string
+              example: Senior Buyer
+    usage:
+      type: object
+      properties:
+        addr:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        id:
+          type: string
+        individual:
+          type: boolean
+        ipRanges:
+          type: string
+        name:
+          type: string
+        registerDate:
+          type: string
+        status:
+          type: integer
+        vatNumber:
+          type: string
+        zipCode:
+          type: string
+    invoice:
+      type: object
+      properties:
+        addtionnalItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/item'
+        comments:
+          type: string
+        creditNoteSendDate:
+          type: string
+        customerId:
+          type: string
+        customerName:
+          type: string
+          example: Acme Corp
+        dateToSend:
+          type: string
+          format: date
+        dueDate: 
+          type: string
+          format: date
+          example: '2019-05-15'
+        dunningSendDate:
+          type: string
+          format: date
+        emissionDate:
+          type: string
+          format: date
+        humanId:
+          type: string
+          example: 20190504-1599
+        id:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/item'
+        message:
+          type: string
+        month:
+          type: integer
+        payment:
+          $ref: '#/components/schemas/payment'
+        paymentMethod:
+          type: object
+          properties:
+            accountId:
+              type: string
+            iban: 
+              type: string
+            sepa:
+              type: boolean
+            typeOfMean:
+              type: string
+        paymentsHistoric:
+          type: array
+          items:
+            $ref: '#/components/schemas/payment'
+        pdfFileName:
+          type: string
+        purchaseOrder: 
+          type: string
+        refund:
+          type: string
+        refundAmount:
+          type: string
+        sendDate: 
+          type: string
+          format: date
+          example: '2019-05-14'
+        status:
+          type: string
+          example: UNPAID  
+        total:
+          type: number
+          format: float
+          example: 5002,37
+        totalPriceGross:
+          type: number
+          format: float
+          example: 116.3399
+        type:
+          type: string
+        validated:
+          type: boolean
+        validationDate: 
+          type: string
+          format: date
+          example: '2019-05-18'
+        validatorId: 
+          type: string
+        vat:
+          type: string
+        year:
+          type: integer
+    payment:
+      type: object
+      properties:
+        amount:
+          type: number
+        amountRefunded:
+          type: number
+        chargeDate:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        currency:
+          type: string
+        description:
+          type: string
+        id: 
+          type: string
+        links:
+          type: object
+          properties:
+            creditor:
+              type: string
+            mandate: 
+              type: string
+            payout:
+              type: string
+            subscription:
+              type: string
+        metadata:
+          type: object
+          properties:
+            idAccountManager:
+              type: string
+            idCustomer:
+              type: string
+            idInvoice:
+              type: string
+        reference:
+          type: string
+        status: 
+          type: string
+    item:
+      type: object
+      properties:
+        discount: 
+          type: number
+        globalQuantity:
+          type: integer
+        itemType:
+          type: string
+        maxStep: 
+          type: number
+        minStep: 
+          type: number
+        name:
+          type: string
+        price:
+          type: integer
+        product:
+          type: object
+          properties:
+            commercialName:
+              type: string
+            description:
+              type: string
+            id:
+              type: string
+            lastUpdate: 
+              type: string
+            matrix: 
+              type: string
+            name:
+              type: string
+            productType:
+              type: string
+            settings: 
+              type: string
+security:
+  - cookieAuth: []
