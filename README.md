@@ -170,7 +170,7 @@ servers:
     url: https://chat.governamental.com.br/api/v1
 # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/franfig-hub/RocketChatManager/1.0.0
+    url: https://virtserver.swaggerhub.com/fran-fig/RocketChatManager/1.0.0
 info:
   version: "0.1.0"
   title: Sistema de geração de dados de gerenciamento do LiveChat da CAIXA

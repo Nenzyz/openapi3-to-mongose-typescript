@@ -1,6 +1,6 @@
 {
   "name": "openapi3-to-mongose-typescript",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Generate Mongoose Schema from OpenAPI 3 Specification yaml files (docs in https://swagger.io/docs/specification/about/)",
   "main": "./lib/src/index.js",
   "scripts": {
