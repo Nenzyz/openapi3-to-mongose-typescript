@@ -1,10 +1,13 @@
 {
   "name": "openapi3-to-mongose-typescript",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Generate Mongoose Schema from openapi3 yaml",
-  "main": "index.js",
+  "main": "./lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "openapi3-to-mongose-typescript": "./lib/index.js"
   },
   "repository": {
     "type": "git",
@@ -20,6 +23,25 @@
     "mongodb",
     "yaml"
   ],
+  "dependencies": {
+    "@types/mongoose": "^5.5.3",
+    "moment": "^2.24.0",
+    "mongoose": "^5.5.11",
+    "mongoose-paginate": "^5.0.3",
+    "js-yaml": "^3.13.1",
+    "yaml": "^1.6.0"
+  },
+  "devDependencies": {
+    "mocha": "^6.1.4",
+    "nodemon": "^1.19.0",
+    "recast": "^0.18.1",
+    "shelljs": "^0.8.3",
+    "ts-lint": "^4.5.1",
+    "ts-node": "^8.0.2",
+    "tslint": "^5.13.1",
+    "typescript": "^3.4.5",
+    "typescript-parser": "^2.6.1"
+  },
   "author": "Francisco Figueiredo",
   "license": "MIT",
   "bugs": {
