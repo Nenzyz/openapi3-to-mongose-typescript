@@ -1,11 +1,13 @@
 {
   "name": "openapi3-to-mongose-typescript",
-  "version": "0.0.1",
-  "description": "Generate Mongoose Schema from openapi3 yaml",
-  "main": "./lib/index.js",
+  "version": "0.0.9",
+  "description": "Generate Mongoose Schema from OpenAPI 3 Specification yaml files (docs in https://swagger.io/docs/specification/about/)",
+  "main": "./lib/src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "compile": "tsc"
+    "compile": "tsc && chmod +x ./lib/src/index.js",
+    "up": "rm -rf ./lib/* && tsc && chmod +x ./lib/src/index.js && npm publish",
+    "run": "tsc && node ./lib/src/index.js"
   },
   "bin": {
     "openapi3-to-mongose-typescript": "./lib/src/index.js"
