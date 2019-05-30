@@ -12,7 +12,7 @@ The package read yaml file and generate:
 * 1 file with object json schema for all high level #/component/schema
 * 1 *index.ts* with connection to mongoose and exported all high level schema model
 
-## Example of Schemas generate by package for the file [api.yml](https://gitlab.com/fran.fig/openapi3-to-mongose-typescript/raw/master/api/api.yml) 
+## Example of Schemas generate by package for the file [api.yml](#example-yaml--apiyml-) above
 
 ### SystemOptions.model.ts
 ```typescript
