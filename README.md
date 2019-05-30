@@ -167,7 +167,7 @@ openapi: 3.0.0
 # Added by API Auto Mocking Plugin
 servers:
   - description: API Server of LiveChat Manager
-    url: https://chat.caixamais.gov.br/api/v1
+    url: https://chat.governamental.com.br/api/v1
 # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/franfig-hub/RocketChatManager/1.0.0
