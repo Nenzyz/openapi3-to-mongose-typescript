@@ -1,0 +1,29 @@
+{
+  "name": "openapi3-to-mongose-typescript",
+  "version": "1.0.0",
+  "description": "Generate Mongoose Schema from openapi3 yaml",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/fran.fig/openapi3-to-mongose-typescript.git"
+  },
+  "keywords": [
+    "mongoose",
+    "openapi3",
+    "swagger",
+    "typescript",
+    "database",
+    "mongo",
+    "mongodb",
+    "yaml"
+  ],
+  "author": "Francisco Figueiredo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://gitlab.com/fran.fig/openapi3-to-mongose-typescript/issues"
+  },
+  "homepage": "https://gitlab.com/fran.fig/openapi3-to-mongose-typescript#readme"
+}
