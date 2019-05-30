@@ -4,7 +4,8 @@
   "description": "Generate Mongoose Schema from openapi3 yaml",
   "main": "./lib/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "tsc"
   },
   "bin": {
     "openapi3-to-mongose-typescript": "./lib/src/index.js"
