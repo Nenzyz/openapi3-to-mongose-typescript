@@ -9,10 +9,12 @@ $ npm install -g openapi3-to-mongose-typescript
 ## Models Generate
 
 The package read yaml file and generate:
-* 1 file with object json schema for all high level #/component/schema
-* 1 *index.ts* with connection to mongoose and exported all high level schema model
+* one file with object json schema for all high level #/component/schema
+* one file **index.ts** with connection to mongoose and exported all high level schema model
+* 
+For developer security, the destination folder of the typescript files, if any, will be moved to a folder of the same name with a timestamp of when it was made. **Don't forget to commit any changes to your git repo before running these command**
 
-## Example of Schemas generate by package for the file [api.yml](#example-yaml--apiyml-) above
+## Example of Schemas generate by package for the file [api.yml](#example-yaml--apiyml-) above 
 
 ### SystemOptions.model.ts
 ```typescript
