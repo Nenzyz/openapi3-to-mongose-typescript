@@ -1,13 +1,14 @@
 const yaml = require('js-yaml');
 // const fs   = require('fs');
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
+import * as shell from 'shelljs';
 import * as path from 'path';
 import moment from 'moment';
 import { capitalize, capitalizeInalterate } from '../util/functions';
  
 // Get document, or throw exception on error
 const commomDirModel: string = './models/' 
-
+const commomDirApi: string = './api/'
 
 const mongooseFieldPattern: {[k: string]: any} = { 
     type: String,
@@ -47,14 +48,24 @@ export class GenerateSchema {
         }
     }
 
-    generateMongooseSchema(outputDir: string = commomDirModel){
-
+    generateMongooseSchema(oDir: string = commomDirModel){
         /** Create models folder, backup current folder */
+        let outputDir = path.resolve(oDir);
         outputDir = path.resolve(outputDir);
+        let stats ;
+        try {
+            stats = fs.lstatSync(outputDir);    
+            if (outputDir.slice(-1) !== '/') outputDir = outputDir + '/';
+            if (stats.isDirectory()) {
+                fs.renameSync(outputDir,outputDir.slice(0,-1) + '-' + (moment().format().replace(/[:]/gmi,'.')) + '/');
+                fs.mkdirpSync(outputDir);    
+            }
+        } catch (error) {
+            fs.mkdirpSync(outputDir);    
+            if (outputDir.slice(-1) !== '/') outputDir = outputDir + '/';
+            stats = fs.lstatSync(outputDir);    
+        }
         if (outputDir.slice(-1) !== '/') outputDir = outputDir + '/';
-        const stats = fs.lstatSync(commomDirModel);
-        if (stats.isDirectory()) fs.renameSync(outputDir,outputDir.slice(0,-1) + '-' + (moment().format().replace(/[:]/gmi,'.')) + '/');
-        fs.mkdirSync(outputDir,{mode: 777,recursive: true});
 
         
         let __arraySchemas: string[] = [];
