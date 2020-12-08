@@ -1,3 +1,7 @@
+# WARN
+
+This is a fork of [original repo](https://gitlab.com/fran.fig/openapi3-to-mongose-typescript#readme).
+
 # OpenApi 3.0 to Mongoose Typescript
 Create Mongoose Schemas and Connection objects from [OpenAPI 3.0 Specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md) yaml files in a folder. Suggestions, fork and collaborations are welcome on my [gitlab](https://gitlab.com/fran.fig/openapi3-to-mongose-typescript)
 

@@ -148,9 +148,9 @@ export { mongoose, Document, Schema, Model, model, ${importList}};
         let __preSchemaDefinition: string = '';
         let __schemaDefinition: string = '';
         let __postSchemaDefinition: string = '';
-        if (field.type.toLowerCase() === 'object') {
+        if ((field.type || "" ).toLowerCase() === 'object') {
             __schemaDefinition = 'export const ' + capitalizeInalterate(prefix)  + (prefix===''?'':'_') + capitalizeInalterate(name) + 'MongooseSchema = new mongoose.Schema({\n';
-            let prop = field.properties;
+            let prop = ( field.properties || {} );
             Object.keys(prop).forEach(k => {
                 let __schemaDefinitionObj: {[k: string]: any} = {};
                 __schemaDefinitionObj[k] = Object.assign({}, mongooseFieldPattern);
@@ -227,7 +227,7 @@ export { mongoose, Document, Schema, Model, model, ${importList}};
     private getType(field, name){
         if (field.type) {
             if (name === 'id' || name === '_id' ) {
-                return 'Schema.Types.ObjectId';
+                return 'mongoose.Schema.Types.ObjectId';
             } else {
                 switch (field.type.toLowerCase()) {
                     case 'number':
